@@ -1,10 +1,11 @@
-﻿using Amazon.SQS;
+﻿using Amazon.SimpleNotificationService;
+using Amazon.SQS;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Aws.Sqs
+namespace Aws
 {
     public class Startup
     {
@@ -22,6 +23,7 @@ namespace Aws.Sqs
 
             services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
             services.AddAWSService<IAmazonSQS>(Configuration.GetAWSOptions("sqs"));
+            services.AddAWSService<IAmazonSimpleNotificationService>(Configuration.GetAWSOptions("sns"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,4 +1,4 @@
-﻿namespace Aws.Sqs.Controllers
+﻿namespace Aws.Controllers
 {
     public class SqsMessage
     {
