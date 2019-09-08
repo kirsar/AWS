@@ -27,7 +27,7 @@ namespace Aws
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -35,6 +35,9 @@ namespace Aws
             }
            
             app.UseMvc();
+
+            var topicArn = (await app.CreateSsnTopic("topic1")).TopicArn;
+            await app.SubscribeToSnsTopic(topicArn);
         }
     }
 }

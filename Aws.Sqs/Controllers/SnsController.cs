@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -11,31 +12,29 @@ namespace Aws.Controllers
     {
         private readonly IAmazonSimpleNotificationService sns;
 
-        private const string Topic = "topic1";
+        private List<string> messages = new List<string>();
 
         public SnsController(IAmazonSimpleNotificationService sns)
         {
             this.sns = sns;
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            sns.UnsubscribeAsync(Topic);
-        }
-
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public IActionResult Get()
         {
-            var res = await sns.SubscribeAsync(new SubscribeRequest(Topic, "http", sns.Config.ServiceURL));
-            // sns.ConfirmSubscriptionAsync(Topic, res.SubscriptionArn)
-
-            return Ok(string.Empty);
+            return Ok(messages);
         }
 
+        // same method will be used by AWS to post messages onto end point
+        // doesn't work now, due need to setup docker to access localhost from aws.localstack
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post(string value = "")
         {
-            sns.PublishAsync(new PublishRequest(Topic, "notification"));
+            // TODO get topic here
+            sns.PublishAsync(new PublishRequest(string.Empty, "notification"));
+
+            // TODO handle AWS notifications and update mesages
+            // https://stackoverflow.com/questions/15079829/example-sns-subscription-confirmation-using-aws-net-sdk
         }
     }
 }
