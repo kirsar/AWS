@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
@@ -28,10 +29,11 @@ namespace Aws.Controllers
         // same method will be used by AWS to post messages onto end point
         // doesn't work now, due need to setup docker to access localhost from aws.localstack
         [HttpPost]
-        public void Post(string value = "")
+        public async void Post(string value = "")
         {
             // TODO get topic here
-            sns.PublishAsync(new PublishRequest(string.Empty, "notification"));
+            var topics = await sns.ListTopicsAsync();
+            await sns.PublishAsync(new PublishRequest(topics.Topics.First().TopicArn, "notification"));
 
             // TODO handle AWS notifications and update mesages
             // https://stackoverflow.com/questions/15079829/example-sns-subscription-confirmation-using-aws-net-sdk

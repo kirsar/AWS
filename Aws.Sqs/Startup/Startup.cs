@@ -1,11 +1,12 @@
-﻿using Amazon.SimpleNotificationService;
+﻿using Amazon.S3;
+using Amazon.SimpleNotificationService;
 using Amazon.SQS;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Aws
+namespace Aws.Startup
 {
     public class Startup
     {
@@ -24,10 +25,12 @@ namespace Aws
             services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
             services.AddAWSService<IAmazonSQS>(Configuration.GetAWSOptions("sqs"));
             services.AddAWSService<IAmazonSimpleNotificationService>(Configuration.GetAWSOptions("sns"));
+            services.AddAWSService<IAmazonS3>(Configuration.GetAWSOptions("sns"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -36,8 +39,10 @@ namespace Aws
            
             app.UseMvc();
 
-            var topicArn = (await app.CreateSsnTopic("topic1")).TopicArn;
-            await app.SubscribeToSnsTopic(topicArn);
+            app.CreateSqsQueue("queue1");
+            app.CreateAndSubsribeSsnTopic("topic1");
+            app.CreateS3Bucket("bucket1");
         }
+        #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
     }
 }
